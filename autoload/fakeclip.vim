@@ -1,5 +1,5 @@
 " fakeclip - pseude clipboard register for non-GUI version of Vim
-" Version: @@VERSION@@
+" Version: 0.2.10
 " Copyright (C) 2008-2012 Kana Natsuno <http://whileimautomaton.net/>
 " License: So-called MIT/X license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -29,6 +29,10 @@ elseif has('win32unix')
   let s:PLATFORM = 'cygwin'
 elseif $DISPLAY != '' && executable('xclip')
   let s:PLATFORM = 'x'
+elseif has('unix')
+  " *nix-based box, but xclip is not installed
+  " probably a headless server without X
+  let s:PLATFORM = 'no_x'
 else
   let s:PLATFORM = 'unknown'
 endif
@@ -176,6 +180,17 @@ function! s:read_clipboard_x()
 endfunction
 
 
+function! s:read_clipboard_no_x()
+  " let's use home area rather than /dev, we probably don't have permissions
+  " to write there
+  let content = ''
+  for line in readfile('/home/' + $USERNAME ? $USERNAME : $USER + '/.clipboard', 'b')
+    let content = content . "\x0A" . substitute(line, "\x0D", '', 'g')
+  endfor
+  return content[1:]
+endfunction
+
+
 function! s:read_clipboard_unknown()
   echoerr 'Getting the clipboard content is not supported on this platform:'
   \       s:PLATFORM
@@ -245,6 +260,12 @@ endfunction
 
 function! s:write_clipboard_x(text)
   call system('xclip', a:text)
+  return
+endfunction
+
+
+function! s:write_clipboard_no_x(text)
+  call writefile(split(a:text, "\x0A", 1), '/home/' + $USERNAME ? $USERNAME : $USER + '/.clipboard', 'b')
   return
 endfunction
 
