@@ -184,7 +184,7 @@ function! s:read_clipboard_no_x()
   " let's use home area rather than /dev, we probably don't have permissions
   " to write there
   let content = ''
-  for line in readfile('/home/' + $USERNAME ? $USERNAME : $USER + '/.clipboard', 'b')
+  for line in readfile(expand('~/.clipboard'), 'b')
     let content = content . "\x0A" . substitute(line, "\x0D", '', 'g')
   endfor
   return content[1:]
@@ -265,7 +265,7 @@ endfunction
 
 
 function! s:write_clipboard_no_x(text)
-  call writefile(split(a:text, "\x0A", 1), '/home/' + $USERNAME ? $USERNAME : $USER + '/.clipboard', 'b')
+  call writefile(split(a:text, "\x0A", 1), expand('~/.clipboard'), 'b')
   return
 endfunction
 
