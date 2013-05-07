@@ -253,7 +253,7 @@ endfunction
 
 
 function! s:write_clipboard_cygwin(text)
-  call writefile(split(a:text, "\x0A", 1), '/dev/clipboard', 'b')
+  call writefile(split(a:text, "\x0A", 1), '/dev/clipboard', 'wb')
   return
 endfunction
 
@@ -265,7 +265,7 @@ endfunction
 
 
 function! s:write_clipboard_no_x(text)
-  call writefile(split(a:text, "\x0A", 1), expand('~/.clipboard'), 'b')
+  call writefile(split(a:text, "\x0A", 1), expand('~/.clipboard'), 'wb')
   return
 endfunction
 
